@@ -1,0 +1,5349 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>LoveStory AI — Dynamic Romantic Prompt Builder</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+    --pink:#ff4f9a;
+    --pink2:#ff79b8;
+    --purple:#8b5cf6;
+    --violet:#6d5dfc;
+    --bg:#07040d;
+    --panel:rgba(255,255,255,.055);
+    --panel2:rgba(255,255,255,.035);
+    --border:rgba(255,255,255,.11);
+    --text:#fff;
+    --muted:#a9a1b5;
+    --green:#6effb0;
+    --danger:#ff718b;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    min-height:100vh;
+    color:var(--text);
+    font-family:
+        "Segoe UI",
+        "Noto Sans Sinhala",
+        Arial,
+        sans-serif;
+
+    background:
+        radial-gradient(circle at 10% 5%,rgba(255,79,154,.18),transparent 28%),
+        radial-gradient(circle at 90% 15%,rgba(139,92,246,.18),transparent 30%),
+        radial-gradient(circle at 50% 100%,rgba(255,79,154,.08),transparent 35%),
+        var(--bg);
+
+    overflow-x:hidden;
+}
+
+body:before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    opacity:.05;
+
+    background-image:
+        radial-gradient(circle,#fff 1px,transparent 1px);
+
+    background-size:70px 70px;
+}
+
+button,
+input,
+textarea,
+select{
+    font-family:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.container{
+    width:min(1080px,92%);
+    margin:auto;
+}
+
+/* =========================================================
+   FLOATING DECORATIONS
+========================================================= */
+
+.floating-heart{
+    position:fixed;
+    pointer-events:none;
+    opacity:.12;
+    font-size:25px;
+    animation:floatHeart 12s linear infinite;
+}
+
+.h1{left:5%;top:75%;animation-delay:0s}
+.h2{left:88%;top:60%;animation-delay:3s}
+.h3{left:15%;top:30%;animation-delay:6s}
+.h4{left:78%;top:20%;animation-delay:9s}
+
+@keyframes floatHeart{
+    0%{
+        transform:translateY(30px) rotate(0);
+        opacity:0;
+    }
+    20%{
+        opacity:.15;
+    }
+    80%{
+        opacity:.12;
+    }
+    100%{
+        transform:translateY(-120px) rotate(25deg);
+        opacity:0;
+    }
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero{
+    text-align:center;
+    padding:65px 15px 35px;
+}
+
+.logo-heart{
+    width:76px;
+    height:76px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:auto;
+
+    font-size:38px;
+
+    border-radius:24px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,79,154,.22),
+            rgba(139,92,246,.22)
+        );
+
+    border:1px solid rgba(255,255,255,.12);
+
+    box-shadow:
+        0 0 50px rgba(255,79,154,.18),
+        inset 0 0 25px rgba(255,255,255,.04);
+
+    animation:heartPulse 2s infinite;
+}
+
+@keyframes heartPulse{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.07)}
+}
+
+.hero h1{
+    margin-top:25px;
+
+    font-size:clamp(38px,7vw,76px);
+    line-height:1.02;
+
+    background:
+        linear-gradient(
+            100deg,
+            #fff,
+            #ff75b7,
+            #b49aff,
+            #fff
+        );
+
+    background-size:250% auto;
+
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+
+    animation:titleGradient 7s linear infinite;
+}
+
+@keyframes titleGradient{
+    to{
+        background-position:250% center;
+    }
+}
+
+.hero p{
+    max-width:720px;
+    margin:22px auto 0;
+
+    color:var(--muted);
+    font-size:16px;
+    line-height:1.8;
+}
+
+.hero-badges{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:9px;
+    margin-top:23px;
+}
+
+.badge{
+    padding:8px 13px;
+    border-radius:999px;
+
+    background:rgba(255,255,255,.045);
+    border:1px solid var(--border);
+
+    color:#d9cce8;
+    font-size:12px;
+}
+
+/* =========================================================
+   MAIN CARD
+========================================================= */
+
+.builder-card{
+    margin-bottom:50px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.065),
+            rgba(255,255,255,.025)
+        );
+
+    border:1px solid var(--border);
+    border-radius:30px;
+
+    backdrop-filter:blur(25px);
+
+    box-shadow:
+        0 35px 100px rgba(0,0,0,.45);
+}
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+.builder-top{
+    padding:23px 28px;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+}
+
+.builder-brand{
+    display:flex;
+    align-items:center;
+    gap:11px;
+}
+
+.brand-icon{
+    width:38px;
+    height:38px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--pink),
+            var(--purple)
+        );
+}
+
+.brand-text strong{
+    display:block;
+    font-size:14px;
+}
+
+.brand-text span{
+    display:block;
+    color:#81788e;
+    font-size:11px;
+    margin-top:2px;
+}
+
+.saved-indicator{
+    font-size:12px;
+    color:#827a8e;
+}
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+.progress-wrap{
+    padding:22px 28px 0;
+}
+
+.progress-meta{
+    display:flex;
+    justify-content:space-between;
+    color:var(--muted);
+    font-size:12px;
+    margin-bottom:10px;
+}
+
+.progress-track{
+    height:7px;
+    border-radius:20px;
+    background:rgba(255,255,255,.07);
+    overflow:hidden;
+}
+
+.progress-fill{
+    height:100%;
+    width:12.5%;
+
+    border-radius:20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--pink),
+            var(--purple)
+        );
+
+    box-shadow:0 0 20px rgba(255,79,154,.35);
+
+    transition:.45s cubic-bezier(.2,.8,.2,1);
+}
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.builder-content{
+    padding:32px 28px;
+}
+
+.step{
+    display:none;
+    animation:stepIn .4s ease;
+}
+
+.step.active{
+    display:block;
+}
+
+@keyframes stepIn{
+    from{
+        opacity:0;
+        transform:translateY(12px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.step-kicker{
+    color:#ff8fc4;
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:1.2px;
+    margin-bottom:9px;
+}
+
+.step-title{
+    font-size:31px;
+    line-height:1.2;
+}
+
+.step-desc{
+    color:var(--muted);
+    margin-top:10px;
+    line-height:1.7;
+    max-width:760px;
+}
+
+/* =========================================================
+   INTENT CARDS
+========================================================= */
+
+.intent-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+    margin-top:28px;
+}
+
+.intent-card{
+    position:relative;
+    padding:20px;
+
+    text-align:left;
+
+    background:rgba(255,255,255,.035);
+    border:1px solid var(--border);
+    border-radius:19px;
+
+    color:white;
+
+    transition:.25s;
+}
+
+.intent-card:hover{
+    transform:translateY(-3px);
+    border-color:rgba(255,79,154,.45);
+    background:rgba(255,79,154,.055);
+}
+
+.intent-card.selected{
+    border-color:var(--pink);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,79,154,.13),
+            rgba(139,92,246,.08)
+        );
+
+    box-shadow:
+        0 0 0 1px rgba(255,79,154,.15),
+        0 15px 35px rgba(255,79,154,.08);
+}
+
+.intent-icon{
+    font-size:28px;
+    margin-bottom:13px;
+}
+
+.intent-card h3{
+    font-size:16px;
+}
+
+.intent-card p{
+    color:#918999;
+    font-size:12px;
+    line-height:1.55;
+    margin-top:5px;
+}
+
+.selected-check{
+    position:absolute;
+    right:14px;
+    top:14px;
+
+    width:24px;
+    height:24px;
+
+    display:none;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:50%;
+    background:var(--pink);
+
+    font-size:12px;
+}
+
+.intent-card.selected .selected-check{
+    display:flex;
+}
+
+/* =========================================================
+   FIELDS
+========================================================= */
+
+.field{
+    margin-top:22px;
+}
+
+.field:first-child{
+    margin-top:0;
+}
+
+label{
+    display:block;
+    color:#e9e5ee;
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:8px;
+}
+
+.optional{
+    color:#766e7e;
+    font-weight:400;
+    font-size:11px;
+    margin-left:5px;
+}
+
+input,
+textarea,
+select{
+    width:100%;
+
+    border:1px solid var(--border);
+
+    background:rgba(0,0,0,.25);
+
+    color:white;
+
+    border-radius:13px;
+
+    padding:14px 15px;
+
+    outline:none;
+
+    font-size:14px;
+
+    transition:.2s;
+}
+
+input::placeholder,
+textarea::placeholder{
+    color:#5f5869;
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+    border-color:rgba(255,79,154,.75);
+
+    box-shadow:
+        0 0 0 3px rgba(255,79,154,.08);
+}
+
+textarea{
+    min-height:125px;
+    resize:vertical;
+    line-height:1.65;
+}
+
+select option{
+    background:#15101c;
+}
+
+.two{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+}
+
+.three{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+}
+
+/* =========================================================
+   SMART NOTICE
+========================================================= */
+
+.smart-notice{
+    margin-top:22px;
+
+    padding:16px 17px;
+
+    border-radius:15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(139,92,246,.09),
+            rgba(255,79,154,.05)
+        );
+
+    border:1px solid rgba(139,92,246,.18);
+
+    color:#c7bdd7;
+
+    font-size:12px;
+    line-height:1.65;
+}
+
+.smart-notice strong{
+    color:#fff;
+}
+
+/* =========================================================
+   TOGGLE CARDS
+========================================================= */
+
+.option-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin-top:16px;
+}
+
+.option-card{
+    position:relative;
+
+    padding:17px;
+
+    border:1px solid var(--border);
+    border-radius:16px;
+
+    background:rgba(255,255,255,.03);
+
+    transition:.2s;
+}
+
+.option-card:hover{
+    border-color:rgba(255,79,154,.4);
+}
+
+.option-card.selected{
+    border-color:var(--pink);
+    background:rgba(255,79,154,.08);
+}
+
+.option-card input{
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+}
+
+.option-card .option-icon{
+    font-size:22px;
+    margin-bottom:8px;
+}
+
+.option-card strong{
+    font-size:13px;
+}
+
+.option-card small{
+    display:block;
+    color:#7f7789;
+    font-size:10px;
+    margin-top:4px;
+    line-height:1.4;
+}
+
+/* =========================================================
+   MEMORIES
+========================================================= */
+
+.memory{
+    position:relative;
+
+    margin-top:17px;
+
+    padding:19px;
+
+    border-radius:19px;
+
+    background:rgba(0,0,0,.17);
+
+    border:1px solid rgba(255,255,255,.09);
+}
+
+.memory-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:16px;
+}
+
+.memory-label{
+    color:#ff91c4;
+    font-size:13px;
+    font-weight:700;
+}
+
+.remove-memory{
+    border:0;
+
+    padding:7px 10px;
+
+    border-radius:8px;
+
+    background:rgba(255,80,110,.1);
+
+    color:#ff8098;
+
+    font-size:11px;
+}
+
+.add-memory{
+    width:100%;
+
+    margin-top:15px;
+
+    padding:14px;
+
+    border:1px dashed rgba(255,255,255,.18);
+
+    border-radius:13px;
+
+    background:rgba(255,255,255,.025);
+
+    color:#ff9ac9;
+
+    transition:.2s;
+}
+
+.add-memory:hover{
+    background:rgba(255,79,154,.05);
+    border-color:rgba(255,79,154,.4);
+}
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.summary-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:13px;
+
+    margin-top:25px;
+}
+
+.summary-item{
+    padding:16px;
+
+    border-radius:15px;
+
+    background:rgba(255,255,255,.035);
+
+    border:1px solid rgba(255,255,255,.07);
+}
+
+.summary-item span{
+    display:block;
+
+    color:#81798a;
+    font-size:10px;
+
+    text-transform:uppercase;
+    letter-spacing:.7px;
+
+    margin-bottom:6px;
+}
+
+.summary-item strong{
+    font-size:13px;
+    line-height:1.5;
+}
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.navigation{
+    padding:0 28px 28px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.nav-left,
+.nav-right{
+    display:flex;
+    gap:10px;
+}
+
+.btn{
+    border:0;
+
+    padding:13px 20px;
+
+    border-radius:13px;
+
+    font-size:13px;
+    font-weight:700;
+
+    transition:.2s;
+}
+
+.btn:hover{
+    transform:translateY(-2px);
+}
+
+.btn-back{
+    background:rgba(255,255,255,.055);
+    color:white;
+    border:1px solid var(--border);
+}
+
+.btn-next{
+    color:white;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--pink),
+            var(--purple)
+        );
+
+    box-shadow:
+        0 12px 30px rgba(255,79,154,.15);
+}
+
+.btn-generate{
+    color:white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff4f9a,
+            #8b5cf6
+        );
+
+    box-shadow:
+        0 12px 35px rgba(255,79,154,.2);
+}
+
+.btn:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+    transform:none;
+}
+
+/* =========================================================
+   RESULT
+========================================================= */
+
+#resultPage{
+    display:none;
+}
+
+.result-card{
+    padding:30px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.065),
+            rgba(255,255,255,.025)
+        );
+
+    border:1px solid var(--border);
+    border-radius:30px;
+
+    box-shadow:0 35px 100px rgba(0,0,0,.45);
+
+    backdrop-filter:blur(25px);
+}
+
+.result-head{
+    text-align:center;
+}
+
+.result-icon{
+    font-size:55px;
+
+    animation:heartPulse 1.7s infinite;
+}
+
+.result-head h2{
+    font-size:34px;
+    margin-top:10px;
+}
+
+.result-head p{
+    color:var(--muted);
+    margin-top:8px;
+    line-height:1.6;
+}
+
+.prompt-toolbar{
+    margin-top:27px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+}
+
+.prompt-label{
+    color:#aaa0b5;
+    font-size:12px;
+    font-weight:700;
+}
+
+.prompt-size{
+    color:#706879;
+    font-size:11px;
+}
+
+.prompt-box{
+    margin-top:10px;
+
+    background:#030207;
+
+    border:1px solid rgba(255,255,255,.1);
+
+    border-radius:18px;
+
+    padding:18px;
+}
+
+#generatedPrompt{
+    min-height:650px;
+
+    border:0;
+
+    background:transparent;
+
+    color:#e8e3ed;
+
+    font-family:
+        Consolas,
+        "Courier New",
+        monospace;
+
+    font-size:12px;
+
+    line-height:1.7;
+
+    resize:vertical;
+
+    box-shadow:none;
+}
+
+#generatedPrompt:focus{
+    box-shadow:none;
+}
+
+.result-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+
+    margin-top:16px;
+}
+
+.copy-success{
+    display:none;
+
+    margin-top:12px;
+
+    color:var(--green);
+
+    font-size:12px;
+}
+
+.result-tip{
+    margin-top:20px;
+
+    padding:17px;
+
+    border-radius:15px;
+
+    background:rgba(139,92,246,.07);
+
+    border:1px solid rgba(139,92,246,.16);
+
+    color:#bbb0cc;
+
+    font-size:12px;
+
+    line-height:1.7;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer{
+    text-align:center;
+
+    padding:0 0 35px;
+
+    color:#625b69;
+
+    font-size:11px;
+}
+
+/* =========================================================
+   HIDDEN
+========================================================= */
+
+.hidden{
+    display:none !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:760px){
+
+    .hero{
+        padding-top:42px;
+    }
+
+    .hero h1{
+        font-size:42px;
+    }
+
+    .builder-top{
+        padding:18px;
+    }
+
+    .progress-wrap{
+        padding:18px 18px 0;
+    }
+
+    .builder-content{
+        padding:25px 18px;
+    }
+
+    .navigation{
+        padding:0 18px 20px;
+        flex-direction:column-reverse;
+    }
+
+    .nav-left,
+    .nav-right{
+        width:100%;
+    }
+
+    .nav-left .btn,
+    .nav-right .btn{
+        width:100%;
+    }
+
+    .intent-grid{
+        grid-template-columns:1fr;
+    }
+
+    .two,
+    .three{
+        grid-template-columns:1fr;
+        gap:0;
+    }
+
+    .option-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .summary-grid{
+        grid-template-columns:1fr;
+    }
+
+    .result-card{
+        padding:20px;
+    }
+
+    .result-head h2{
+        font-size:27px;
+    }
+
+    #generatedPrompt{
+        min-height:520px;
+    }
+}
+
+@media(max-width:420px){
+
+    .option-grid{
+        grid-template-columns:1fr;
+    }
+
+    .hero h1{
+        font-size:37px;
+    }
+
+    .step-title{
+        font-size:26px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="floating-heart h1">❤️</div>
+<div class="floating-heart h2">💗</div>
+<div class="floating-heart h3">💜</div>
+<div class="floating-heart h4">💕</div>
+
+<div class="container">
+
+<!-- =======================================================
+     HERO
+======================================================= -->
+
+<section class="hero">
+
+    <div class="logo-heart">❤️</div>
+
+    <h1>
+        Your Love.<br>
+        Your Story. ✨
+    </h1>
+
+    <p>
+        ඔයා හදන්න යන Romantic Website එක ගැන අපිට කියන්න.
+        ඔයා තෝරන occasion එක, story එක, memories, mood,
+        design style සහ surprises අනුව අපි automatically
+        personalized AI Master Build Prompt එකක් හදලා දෙන්නම්.
+    </p>
+
+    <div class="hero-badges">
+        <span class="badge">🧠 Smart Questions</span>
+        <span class="badge">🎯 Occasion Based</span>
+        <span class="badge">💖 Personalised</span>
+        <span class="badge">⚡ AI Ready</span>
+    </div>
+
+</section>
+
+
+<!-- =======================================================
+     BUILDER
+======================================================= -->
+
+<section id="builderPage">
+
+<div class="builder-card">
+
+    <div class="builder-top">
+
+        <div class="builder-brand">
+
+            <div class="brand-icon">💌</div>
+
+            <div class="brand-text">
+                <strong>LoveStory AI Builder</strong>
+                <span>Dynamic Romantic Prompt Engine</span>
+            </div>
+
+        </div>
+
+        <div class="saved-indicator" id="savedIndicator">
+            ● Auto-save
+        </div>
+
+    </div>
+
+
+    <div class="progress-wrap">
+
+        <div class="progress-meta">
+
+            <span id="stepText">
+                පියවර 1 / 8
+            </span>
+
+            <span id="stepPercent">
+                12%
+            </span>
+
+        </div>
+
+        <div class="progress-track">
+
+            <div
+                class="progress-fill"
+                id="progressFill">
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="builder-content">
+
+<form id="loveForm">
+
+
+<!-- =======================================================
+     STEP 1 — INTENT
+======================================================= -->
+
+<div class="step active" data-step="1">
+
+    <div class="step-kicker">
+        STEP 01 · YOUR INTENTION
+    </div>
+
+    <h2 class="step-title">
+        ඔයා මේ Website එක හදන්නේ මොකටද? ❤️
+    </h2>
+
+    <p class="step-desc">
+        මුලින්ම experience එකේ main purpose එක තෝරන්න.
+        ඒකට අනුව ඉදිරි questions automatically වෙනස් වෙනවා.
+    </p>
+
+
+    <div class="intent-grid">
+
+        <button type="button" class="intent-card"
+            data-intent="birthday">
+
+            <span class="selected-check">✓</span>
+
+            <div class="intent-icon">🎂</div>
+
+            <h3>Birthday Love</h3>
+
+            <p>
+                එයාගේ birthday එක වෙනුවෙන්
+                special romantic experience එකක්.
+            </p>
+
+        </button>
+
+
+        <button type="button" class="intent-card"
+            data-intent="anniversary">
+
+            <span class="selected-check">✓</span>
+
+            <div class="intent-icon">❤️</div>
+
+            <h3>Anniversary</h3>
+
+            <p>
+                ඔයාලගේ relationship journey එක
+                celebrate කරන website එකක්.
+            </p>
+
+        </button>
+
+
+        <button type="button" class="intent-card"
+            data-intent="proposal">
+
+            <span class="selected-check">✓</span>
+
+            <div class="intent-icon">💍</div>
+
+            <h3>Proposal</h3>
+
+            <p>
+                Proposal එකක් වෙනුවෙන් emotional
+                interactive experience එකක්.
+            </p>
+
+        </button>
+
+
+        <button type="button" class="intent-card"
+            data-intent="confession">
+
+            <span class="selected-check">✓</span>
+
+            <div class="intent-icon">💌</div>
+
+            <h3>Love Confession</h3>
+
+            <p>
+                හිතේ තියෙන ආදරේ special
+                විදිහකට කියන්න.
+            </p>
+
+        </button>
+
+
+        <button type="button" class="intent-card"
+            data-intent="longdistance">
+
+            <span class="selected-check">✓</span>
+
+            <div class="intent-icon">✈️</div>
+
+            <h3>Long Distance</h3>
+
+            <p>
+                දුරින් ඉන්න දෙන්නෙක් වෙනුවෙන්
+                distance + countdown experience.
+            </p>
+
+        </button>
+
+
+        <button type="button" class="intent-card"
+            data-intent="gift">
+
+            <span class="selected-check">✓</span>
+
+            <div class="intent-icon">🎁</div>
+
+            <h3>Romantic Gift</h3>
+
+            <p>
+                විශේෂ අවස්ථාවක් නැතිව වුණත්
+                digital love gift එකක්.
+            </p>
+
+        </button>
+
+
+        <button type="button" class="intent-card"
+            data-intent="justbecause">
+
+            <span class="selected-check">✓</span>
+
+            <div class="intent-icon">🥹</div>
+
+            <h3>Just Because</h3>
+
+            <p>
+                “මම ඔයාට ආදරෙයි” කියලා කියන්න
+                හේතුවක් ඕන නැති experience එක.
+            </p>
+
+        </button>
+
+
+        <button type="button" class="intent-card"
+            data-intent="custom">
+
+            <span class="selected-check">✓</span>
+
+            <div class="intent-icon">✨</div>
+
+            <h3>Something Else</h3>
+
+            <p>
+                ඔයාගේම unique idea එකක්
+                වෙනුවෙන් custom experience.
+            </p>
+
+        </button>
+
+    </div>
+
+
+    <div id="customIntentBox" class="field hidden">
+
+        <label>
+            ඔයා හදන්න යන experience එක ගැන කියන්න
+        </label>
+
+        <textarea
+            id="customIntent"
+            placeholder="උදා: අපේ first meeting එක අවුරුද්දක් පිරෙන නිසා ඒ දවසේ memories වලින් website එකක් හදන්න ඕන..."
+        ></textarea>
+
+    </div>
+
+
+    <div class="smart-notice">
+
+        🧠 <strong>Smart Mode:</strong>
+        ඔයා Birthday තෝරනවා නම් birthday-specific
+        questions එනවා. Anniversary තෝරනවා නම්
+        relationship milestones වගේ questions එනවා.
+        Unnecessary questions අපි hide කරනවා.
+
+    </div>
+
+</div>
+
+
+<!-- =======================================================
+     STEP 2 — PEOPLE
+======================================================= -->
+
+<div class="step" data-step="2">
+
+    <div class="step-kicker">
+        STEP 02 · THE TWO OF YOU
+    </div>
+
+    <h2 class="step-title">
+        මේ ආදර කතාවේ කවුද? 💕
+    </h2>
+
+    <p class="step-desc">
+        මේ details website එකේ hero, messages,
+        love letter සහ personalized content සඳහා භාවිතා වේ.
+    </p>
+
+
+    <div class="two">
+
+        <div class="field">
+
+            <label>ඔයාගේ නම</label>
+
+            <input
+                name="yourName"
+                type="text"
+                placeholder="උදා: කවිඳු"
+                required
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                එයාගේ නම
+            </label>
+
+            <input
+                name="partnerName"
+                type="text"
+                placeholder="උදා: සෙනුලි"
+                required
+            >
+
+        </div>
+
+    </div>
+
+
+    <div class="two">
+
+        <div class="field">
+
+            <label>
+                එයාට කියන ආදරණීය නම
+                <span class="optional">Optional</span>
+            </label>
+
+            <input
+                name="nickname"
+                type="text"
+                placeholder="මැණික / බබා / සුදු..."
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                ඔයාලගේ relationship type
+            </label>
+
+            <select name="relationship">
+
+                <option value="">
+                    තෝරන්න
+                </option>
+
+                <option>
+                    ආදරවන්තයෝ
+                </option>
+
+                <option>
+                    ආදරවන්තියෝ
+                </option>
+
+                <option>
+                    විවාහක යුවළක්
+                </option>
+
+                <option>
+                    Long Distance Couple
+                </option>
+
+                <option>
+                    වෙනත්
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            එයා ගැන ඔයාට describe කරන්න පුළුවන්
+            වචන කිහිපයක්
+            <span class="optional">Optional</span>
+        </label>
+
+        <textarea
+            name="partnerDescription"
+            placeholder="එයා caring, funny, little crazy, මට හැම වෙලේම support කරන කෙනෙක්..."
+        ></textarea>
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            මේ website එක එයා දැක්කම
+            මොන feeling එකක් එන්න ඕනද?
+        </label>
+
+        <textarea
+            name="desiredFeeling"
+            placeholder="එයාට මගේ ආදරේ ඇත්තටම දැනෙන්න ඕන. Emotional වෙන්න ඕන..."
+        ></textarea>
+
+    </div>
+
+</div>
+
+
+<!-- =======================================================
+     STEP 3 — OCCASION
+======================================================= -->
+
+<div class="step" data-step="3">
+
+    <div class="step-kicker">
+        STEP 03 · OCCASION STORY
+    </div>
+
+    <h2 class="step-title" id="occasionTitle">
+        මේක විශේෂ වෙන්නේ ඇයි? ✨
+    </h2>
+
+    <p class="step-desc" id="occasionDescription">
+        ඔයා තෝරපු experience එකට ගැළපෙන
+        details මෙතනින් ගමු.
+    </p>
+
+
+    <!-- BIRTHDAY -->
+
+    <div id="birthdayFields" class="occasion-fields hidden">
+
+        <div class="two">
+
+            <div class="field">
+
+                <label>
+                    Birthday එක තියෙන්නේ කවදාද?
+                </label>
+
+                <input
+                    name="birthdayDate"
+                    type="date"
+                >
+
+            </div>
+
+            <div class="field">
+
+                <label>
+                    එයාගේ වයස
+                    <span class="optional">Optional</span>
+                </label>
+
+                <input
+                    name="birthdayAge"
+                    type="number"
+                    min="1"
+                    placeholder="උදා: 24"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Birthday එකේ main message එක
+            </label>
+
+            <textarea
+                name="birthdayMessage"
+                placeholder="Happy Birthday මගේ මැණික..."
+            ></textarea>
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                එයා කැමති දේවල්
+                <span class="optional">Optional</span>
+            </label>
+
+            <textarea
+                name="birthdayFavorites"
+                placeholder="Favorite food, flowers, colors, movies, hobbies..."
+            ></textarea>
+
+        </div>
+
+    </div>
+
+
+    <!-- ANNIVERSARY -->
+
+    <div id="anniversaryFields" class="occasion-fields hidden">
+
+        <div class="field">
+
+            <label>
+                මේ Anniversary එක මොකක්ද?
+            </label>
+
+            <input
+                name="anniversaryType"
+                type="text"
+                placeholder="උදා: අපේ 3rd Anniversary"
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                ඔයාලගේ relationship එකේ
+                වැදගත් milestones
+            </label>
+
+            <textarea
+                name="anniversaryMilestones"
+                placeholder="First date, first trip, first gift, proposal, important moments..."
+            ></textarea>
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                මේ Anniversary එක වෙනුවෙන්
+                කියන්න ඕන message එක
+            </label>
+
+            <textarea
+                name="anniversaryMessage"
+                placeholder="අවුරුදු 3ක් ගියත් මගේ ආදරේ තාමත් එදා වගේමයි..."
+            ></textarea>
+
+        </div>
+
+    </div>
+
+
+    <!-- PROPOSAL -->
+
+    <div id="proposalFields" class="occasion-fields hidden">
+
+        <div class="field">
+
+            <label>
+                Proposal එකේ story එක
+            </label>
+
+            <textarea
+                name="proposalStory"
+                placeholder="Proposal එක plan කළේ කොහොමද? ඇයි මේ moment එක special?"
+            ></textarea>
+
+        </div>
+
+
+        <div class="two">
+
+            <div class="field">
+
+                <label>
+                    Proposal location
+                    <span class="optional">Optional</span>
+                </label>
+
+                <input
+                    name="proposalLocation"
+                    type="text"
+                    placeholder="උදා: Galle Face"
+                >
+
+            </div>
+
+            <div class="field">
+
+                <label>
+                    Proposal date
+                    <span class="optional">Optional</span>
+                </label>
+
+                <input
+                    name="proposalDate"
+                    type="date"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                අවසානයේ අහන්න ඕන ප්‍රශ්නය
+            </label>
+
+            <input
+                name="proposalQuestion"
+                type="text"
+                placeholder="Will you marry me? ❤️"
+            >
+
+        </div>
+
+    </div>
+
+
+    <!-- CONFESSION -->
+
+    <div id="confessionFields" class="occasion-fields hidden">
+
+        <div class="field">
+
+            <label>
+                ඔයාට එයා ගැන මුලින්ම
+                දැනුණු feeling එක
+            </label>
+
+            <textarea
+                name="firstFeeling"
+                placeholder="මුලින්ම එයාව දැක්ක දවසේ මට හිතුණේ..."
+            ></textarea>
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                මෙච්චර කාලයක් මේ feeling එක
+                hide කළේ ඇයි?
+            </label>
+
+            <textarea
+                name="confessionReason"
+                placeholder="කියන්න බය හිතුණා / friendship එක නැති වෙයි කියලා..."
+            ></textarea>
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Confession message එක
+            </label>
+
+            <textarea
+                name="confessionMessage"
+                placeholder="මම අද මේක කියන්නේ..."
+            ></textarea>
+
+        </div>
+
+    </div>
+
+
+    <!-- LONG DISTANCE -->
+
+    <div id="longdistanceFields" class="occasion-fields hidden">
+
+        <div class="two">
+
+            <div class="field">
+
+                <label>
+                    ඔයා ඉන්නේ කොහෙද?
+                </label>
+
+                <input
+                    name="yourCity"
+                    type="text"
+                    placeholder="Colombo"
+                >
+
+            </div>
+
+            <div class="field">
+
+                <label>
+                    එයා ඉන්නේ කොහෙද?
+                </label>
+
+                <input
+                    name="partnerCity"
+                    type="text"
+                    placeholder="Kandy"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                ඔයාලා physically දුරින් ඉන්නේ
+                කොච්චර කාලෙක ඉඳන්ද?
+            </label>
+
+            <input
+                name="distanceDuration"
+                type="text"
+                placeholder="මාස 8ක් / අවුරුදු 2ක්..."
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                එයාව miss වෙද්දී ඔයාට
+                වැඩියෙන්ම දැනෙන්නේ මොකක්ද?
+            </label>
+
+            <textarea
+                name="distanceFeeling"
+                placeholder="එයා ළඟ නැති එක, hug එකක් දෙන්න බැරි එක..."
+            ></textarea>
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                ඊළඟට හම්බවෙන්න බලාපොරොත්තු වෙන දිනය
+                <span class="optional">Optional</span>
+            </label>
+
+            <input
+                name="nextMeeting"
+                type="date"
+            >
+
+        </div>
+
+    </div>
+
+
+    <!-- GIFT / JUST BECAUSE -->
+
+    <div id="giftFields" class="occasion-fields hidden">
+
+        <div class="field">
+
+            <label>
+                මේ gift එක දෙන්න හිතුණේ ඇයි?
+            </label>
+
+            <textarea
+                name="giftReason"
+                placeholder="එයා මට කරන හැම දෙයක්ම appreciate කරනවා කියලා පෙන්නන්න..."
+            ></textarea>
+
+        </div>
+
+    </div>
+
+
+    <div id="justbecauseFields" class="occasion-fields hidden">
+
+        <div class="field">
+
+            <label>
+                අද එයාට කියන්න හිතෙන දේ
+            </label>
+
+            <textarea
+                name="justBecauseMessage"
+                placeholder="විශේෂ දවසක් නෙමෙයි. ඒත් මට ඔයාට කියන්න හිතුණා..."
+            ></textarea>
+
+        </div>
+
+    </div>
+
+
+    <!-- CUSTOM -->
+
+    <div id="customFields" class="occasion-fields hidden">
+
+        <div class="field">
+
+            <label>
+                ඔයාගේ custom idea එක
+            </label>
+
+            <textarea
+                name="customExperience"
+                placeholder="Website එක open කළාම මුලින් secret question එකක් එන්න ඕන..."
+            ></textarea>
+
+        </div>
+
+    </div>
+
+
+    <div class="smart-notice">
+        🎯 <strong>Dynamic Section:</strong>
+        මේ section එකේ පෙන්වන්නේ ඔයා Step 1 එකේ
+        තෝරපු experience එකට අදාළ questions විතරයි.
+    </div>
+
+</div>
+
+
+<!-- =======================================================
+     STEP 4 — LOVE STORY
+======================================================= -->
+
+<div class="step" data-step="4">
+
+    <div class="step-kicker">
+        STEP 04 · YOUR STORY
+    </div>
+
+    <h2 class="step-title">
+        AI එකට ඔයාලගේ ඇත්ත කතාව කියමු. 🥹
+    </h2>
+
+    <p class="step-desc">
+        මෙතන තියෙන answers direct copy කරනවා වෙනුවට,
+        AI prompt එක website එකේ natural storytelling
+        content එකක් බවට transform කරන්න කියනවා.
+    </p>
+
+
+    <div class="field">
+
+        <label>
+            ඔයාලා මුලින්ම හම්බවුණේ කොහොමද?
+        </label>
+
+        <textarea
+            name="howMet"
+            placeholder="අපි මුලින්ම school එකේදී හම්බවුණේ..."
+        ></textarea>
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            මුලින්ම කතා කළේ කොහොමද?
+        </label>
+
+        <textarea
+            name="firstConversation"
+            placeholder="මුලින්ම message එක දැම්මේ එයා..."
+        ></textarea>
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            ඔයාට කවදාවත් අමතක නොවන මතකය
+        </label>
+
+        <textarea
+            name="favoriteMemory"
+            placeholder="එදා අපි දෙන්නා..."
+        ></textarea>
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            එයා ගැන ඔයා වැඩියෙන්ම ආදරේ කරන දේ
+        </label>
+
+        <textarea
+            name="whatILove"
+            placeholder="එයාගේ හිනාව, caring එක, මාව තේරුම් ගන්න විදිහ..."
+        ></textarea>
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            එයාව වෙනස්ම කෙනෙක් කරන්නේ මොකක්ද?
+        </label>
+
+        <textarea
+            name="whatMakesSpecial"
+            placeholder="අනිත් අයට වඩා එයා special වෙන්නේ..."
+        ></textarea>
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            ඔයා එයාගෙන් ඉගෙනගත්ත දෙයක්
+            <span class="optional">Optional</span>
+        </label>
+
+        <textarea
+            name="learnedFromPartner"
+            placeholder="එයා මට patience එක, trust එක..."
+        ></textarea>
+
+    </div>
+
+</div>
+
+
+<!-- =======================================================
+     STEP 5 — DATES + MEDIA
+======================================================= -->
+
+<div class="step" data-step="5">
+
+    <div class="step-kicker">
+        STEP 05 · DETAILS & MEMORIES
+    </div>
+
+    <h2 class="step-title">
+        මතක ටිකක් Website එකට දාමු. 📸
+    </h2>
+
+    <p class="step-desc">
+        Date, photos, songs සහ special details තියෙනවා නම්
+        ඒවා website experience එක තවත් personal කරන්න භාවිතා කරනවා.
+    </p>
+
+
+    <div class="two">
+
+        <div class="field">
+
+            <label>
+                Relationship Start Date
+                <span class="optional">Optional</span>
+            </label>
+
+            <input
+                name="relationshipStart"
+                type="date"
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Special Date
+                <span class="optional">Optional</span>
+            </label>
+
+            <input
+                name="specialDate"
+                type="date"
+            >
+
+        </div>
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            Favorite Song
+            <span class="optional">Optional</span>
+        </label>
+
+        <input
+            name="favoriteSong"
+            type="text"
+            placeholder="Song name / YouTube URL"
+        >
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            Main Love Memory
+        </label>
+
+        <textarea
+            name="mainMemory"
+            placeholder="ඔයාගේ relationship එක represent කරන එකම memory එකක්..."
+        ></textarea>
+
+    </div>
+
+
+    <div
+        id="memoriesContainer">
+    </div>
+
+
+    <button
+        type="button"
+        class="add-memory"
+        id="addMemory">
+
+        + 📸 තවත් Memory එකක් එකතු කරන්න
+
+    </button>
+
+
+    <div class="smart-notice">
+
+        📸 <strong>Photo URLs Optional.</strong>
+        Userට photo URL නැත්නම් AI prompt එක
+        image placeholders generate කරන්න කියලා අපි instruct කරනවා.
+        Fake URLs invent කරන්න prompt එකට allow කරන්නේ නැහැ.
+
+    </div>
+
+</div>
+
+
+<!-- =======================================================
+     STEP 6 — DESIGN
+======================================================= -->
+
+<div class="step" data-step="6">
+
+    <div class="step-kicker">
+        STEP 06 · VISUAL PERSONALITY
+    </div>
+
+    <h2 class="step-title">
+        Website එකේ ලෝකය කොහොමද? 🎨
+    </h2>
+
+    <p class="step-desc">
+        Userගේ answers අනුව AI එකට visual identity එක build
+        කරන්න මේ choices භාවිතා වෙනවා.
+    </p>
+
+
+    <div class="field">
+
+        <label>
+            Main Visual Style
+        </label>
+
+        <div class="option-grid">
+
+            <label class="option-card">
+                <input
+                    type="checkbox"
+                    name="style"
+                    value="Cinematic"
+                >
+                <div class="option-icon">🎬</div>
+                <strong>Cinematic</strong>
+                <small>Movie-like emotional experience</small>
+            </label>
+
+
+            <label class="option-card">
+                <input
+                    type="checkbox"
+                    name="style"
+                    value="Luxury"
+                >
+                <div class="option-icon">💎</div>
+                <strong>Luxury</strong>
+                <small>Premium elegant visual system</small>
+            </label>
+
+
+            <label class="option-card">
+                <input
+                    type="checkbox"
+                    name="style"
+                    value="Cute"
+                >
+                <div class="option-icon">🧸</div>
+                <strong>Cute</strong>
+                <small>Sweet playful romance</small>
+            </label>
+
+
+            <label class="option-card">
+                <input
+                    type="checkbox"
+                    name="style"
+                    value="Dreamy"
+                >
+                <div class="option-icon">🌙</div>
+                <strong>Dreamy</strong>
+                <small>Soft magical atmosphere</small>
+            </label>
+
+
+            <label class="option-card">
+                <input
+                    type="checkbox"
+                    name="style"
+                    value="Dark Romance"
+                >
+                <div class="option-icon">🖤</div>
+                <strong>Dark Romance</strong>
+                <small>Deep emotional aesthetic</small>
+            </label>
+
+
+            <label class="option-card">
+                <input
+                    type="checkbox"
+                    name="style"
+                    value="Minimal Elegant"
+                >
+                <div class="option-icon">✨</div>
+                <strong>Minimal</strong>
+                <small>Clean sophisticated design</small>
+            </label>
+
+        </div>
+
+    </div>
+
+
+    <div class="two">
+
+        <div class="field">
+
+            <label>
+                Preferred Colors
+                <span class="optional">Optional</span>
+            </label>
+
+            <input
+                name="favoriteColor"
+                type="text"
+                placeholder="Pink, Purple, Black..."
+            >
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Mood
+            </label>
+
+            <select name="mood">
+
+                <option>Romantic</option>
+                <option>Emotional</option>
+                <option>Dreamy</option>
+                <option>Cinematic</option>
+                <option>Cute & Sweet</option>
+                <option>Passionate</option>
+                <option>Elegant</option>
+                <option>Playful</option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            Typography Preference
+            <span class="optional">Optional</span>
+        </label>
+
+        <select name="typography">
+
+            <option value="">
+                AI choose based on design
+            </option>
+
+            <option>
+                Elegant Serif
+            </option>
+
+            <option>
+                Modern Sans
+            </option>
+
+            <option>
+                Handwritten Love Letter
+            </option>
+
+            <option>
+                Mixed Elegant Typography
+            </option>
+
+        </select>
+
+    </div>
+
+</div>
+
+
+<!-- =======================================================
+     STEP 7 — INTERACTIONS
+======================================================= -->
+
+<div class="step" data-step="7">
+
+    <div class="step-kicker">
+        STEP 07 · EXPERIENCE FEATURES
+    </div>
+
+    <h2 class="step-title">
+        Website එකේ මොන magic එක තියෙන්න ඕනද? ✨
+    </h2>
+
+    <p class="step-desc">
+        ඔයා කැමති interactions select කරන්න.
+        Occasion එක අනුව AI එක relevant features prioritize කරයි.
+    </p>
+
+
+    <div class="option-grid">
+
+        <label class="option-card">
+            <input
+                type="checkbox"
+                name="feature"
+                value="Live Relationship Counter"
+            >
+            <div class="option-icon">⏳</div>
+            <strong>Love Counter</strong>
+            <small>Days, hours, minutes, seconds</small>
+        </label>
+
+
+        <label class="option-card">
+            <input
+                type="checkbox"
+                name="feature"
+                value="Countdown"
+            >
+            <div class="option-icon">🕐</div>
+            <strong>Countdown</strong>
+            <small>Countdown to special date</small>
+        </label>
+
+
+        <label class="option-card">
+            <input
+                type="checkbox"
+                name="feature"
+                value="Memory Timeline"
+            >
+            <div class="option-icon">📖</div>
+            <strong>Timeline</strong>
+            <small>Beautiful relationship journey</small>
+        </label>
+
+
+        <label class="option-card">
+            <input
+                type="checkbox"
+                name="feature"
+                value="Photo Gallery"
+            >
+            <div class="option-icon">📸</div>
+            <strong>Gallery</strong>
+            <small>Responsive memory gallery</small>
+        </label>
+
+
+        <label class="option-card">
+            <input
+                type="checkbox"
+                name="feature"
+                value="Love Letter"
+            >
+            <div class="option-icon">💌</div>
+            <strong>Love Letter</strong>
+            <small>Emotional letter section</small>
+        </label>
+
+
+        <label class="option-card">
+            <input
+                type="checkbox"
+                name="feature"
+                value="Reasons I Love You"
+            >
+            <div class="option-icon">💕</div>
+            <strong>Reasons</strong>
+            <small>Animated love reasons</small>
+        </label>
+
+
+        <label class="option-card">
+            <input
+                type="checkbox"
+                name="feature"
+                value="Secret Surprise"
+            >
+            <div class="option-icon">🔐</div>
+            <strong>Secret Reveal</strong>
+            <small>Hidden surprise interaction</small>
+        </label>
+
+
+        <label class="option-card">
+            <input
+                type="checkbox"
+                name="feature"
+                value="Music Section"
+            >
+            <div class="option-icon">🎵</div>
+            <strong>Music</strong>
+            <small>User-initiated music experience</small>
+        </label>
+
+
+        <label class="option-card">
+            <input
+                type="checkbox"
+                name="feature"
+                value="Floating Hearts & Particles"
+            >
+            <div class="option-icon">✨</div>
+            <strong>Particles</strong>
+            <small>Ambient romantic effects</small>
+        </label>
+
+
+        <label class="option-card">
+            <input
+                type="checkbox"
+                name="feature"
+                value="Interactive Final Reveal"
+            >
+            <div class="option-icon">💫</div>
+            <strong>Final Reveal</strong>
+            <small>Emotional ending interaction</small>
+        </label>
+
+
+        <label class="option-card">
+            <input
+                type="checkbox"
+                name="feature"
+                value="Distance Section"
+            >
+            <div class="option-icon">🌍</div>
+            <strong>Distance</strong>
+            <small>For long-distance couples</small>
+        </label>
+
+
+        <label class="option-card">
+            <input
+                type="checkbox"
+                name="feature"
+                value="Interactive Secret Question"
+            >
+            <div class="option-icon">❓</div>
+            <strong>Secret Question</strong>
+            <small>Interactive opening/reveal</small>
+        </label>
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            Website open කළාම first interaction එක
+            කොහොමද වෙන්න ඕන?
+        </label>
+
+        <textarea
+            name="openingInteraction"
+            placeholder="මුලින් dark screen එකක්. “Someone has a message for you...” කියලා පෙන්වලා click කළාම story එක open වෙන්න..."
+        ></textarea>
+
+    </div>
+
+</div>
+
+
+<!-- =======================================================
+     STEP 8 — FINAL
+======================================================= -->
+
+<div class="step" data-step="8">
+
+    <div class="step-kicker">
+        STEP 08 · FINAL EMOTION
+    </div>
+
+    <h2 class="step-title">
+        අවසානයේ එයාට මොනවද කියන්න ඕන? 💌
+    </h2>
+
+    <p class="step-desc">
+        මේ තමයි website එකේ emotional climax එක.
+    </p>
+
+
+    <div class="field">
+
+        <label>
+            Final Love Message
+        </label>
+
+        <textarea
+            name="loveMessage"
+            placeholder="මගේ මැණික, ඔයා මගේ ජීවිතේට ආපු එක..."
+        ></textarea>
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            Final Ending
+        </label>
+
+        <textarea
+            name="ending"
+            placeholder="Forever and always, it's you. ❤️"
+        ></textarea>
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            Secret Surprise
+            <span class="optional">Optional</span>
+        </label>
+
+        <textarea
+            name="surprise"
+            placeholder="Secret button එක click කළාම මගේ voice message එකට link එකක්..."
+        ></textarea>
+
+    </div>
+
+
+    <div class="field">
+
+        <label>
+            Website එකෙන් එයාට ලැබෙන්න ඕන
+            අවසාන feeling එක
+        </label>
+
+        <textarea
+            name="finalFeeling"
+            placeholder="එයා website එක close කළත් මාව තවත් ආදරෙන් මතක් කරන්න ඕන..."
+        ></textarea>
+
+    </div>
+
+
+    <div class="smart-notice">
+
+        ❤️ <strong>Almost ready.</strong>
+        දැන් අපි ඔයාගේ answers ටික analyze කරලා
+        generic prompt එකක් නෙමෙයි,
+        ඔයාගේ exact romantic experience එකට ගැළපෙන
+        Master Build Specification එකක් generate කරනවා.
+
+    </div>
+
+
+    <div class="summary-grid" id="summaryGrid"></div>
+
+</div>
+
+
+<!-- NAVIGATION -->
+
+</form>
+
+</div>
+
+
+<div class="navigation">
+
+    <div class="nav-left">
+
+        <button
+            type="button"
+            class="btn btn-back"
+            id="backBtn">
+
+            ← ආපසු
+
+        </button>
+
+    </div>
+
+
+    <div class="nav-right">
+
+        <button
+            type="button"
+            class="btn btn-next"
+            id="nextBtn">
+
+            ඊළඟට →
+
+        </button>
+
+
+        <button
+            type="button"
+            class="btn btn-generate hidden"
+            id="generateBtn">
+
+            ❤️ Master Prompt එක හදමු
+
+        </button>
+
+    </div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =======================================================
+     RESULT
+======================================================= -->
+
+<section id="resultPage">
+
+<div class="result-card">
+
+    <div class="result-head">
+
+        <div class="result-icon">
+            💌
+        </div>
+
+        <h2>
+            Your Master Prompt is Ready! ✨
+        </h2>
+
+        <p>
+            මේ prompt එක userගේ answers, occasion,
+            design preferences සහ selected experience
+            අනුව dynamically generated.
+        </p>
+
+    </div>
+
+
+    <div class="prompt-toolbar">
+
+        <span class="prompt-label">
+            AI MASTER BUILD PROMPT
+        </span>
+
+        <span
+            class="prompt-size"
+            id="promptSize">
+            0 characters
+        </span>
+
+    </div>
+
+
+    <div class="prompt-box">
+
+        <textarea
+            id="generatedPrompt"
+            readonly>
+        </textarea>
+
+    </div>
+
+
+    <div
+        class="copy-success"
+        id="copySuccess">
+
+        ✓ Prompt එක clipboard එකට copy වුණා!
+
+    </div>
+
+
+    <div class="result-actions">
+
+        <button
+            class="btn btn-generate"
+            id="copyBtn">
+
+            📋 Copy Master Prompt
+
+        </button>
+
+
+        <button
+            class="btn btn-back"
+            id="editBtn">
+
+            ✏️ Details Edit කරන්න
+
+        </button>
+
+
+        <button
+            class="btn btn-back"
+            id="newBtn">
+
+            ✨ New Love Story
+
+        </button>
+
+    </div>
+
+
+    <div class="result-tip">
+
+        💡 <strong>How to use:</strong>
+        Prompt එක Copy කරලා ChatGPT, Claude, Gemini,
+        Lovable, Bolt, Cursor වගේ AI development tool එකකට
+        paste කරන්න. AI එකට මේ prompt එකේ තියෙන
+        personal story + active features + design direction
+        අනුව complete website එක build කරන්න පුළුවන්.
+
+    </div>
+
+</div>
+
+</section>
+
+
+<footer>
+    Made with ❤️ for people who believe love deserves its own little universe.
+</footer>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let currentStep = 1;
+const TOTAL_STEPS = 8;
+
+let selectedIntent = "";
+let memories = [];
+
+const form = document.getElementById("loveForm");
+
+const steps = document.querySelectorAll(".step");
+
+const progressFill =
+    document.getElementById("progressFill");
+
+const stepText =
+    document.getElementById("stepText");
+
+const stepPercent =
+    document.getElementById("stepPercent");
+
+const nextBtn =
+    document.getElementById("nextBtn");
+
+const backBtn =
+    document.getElementById("backBtn");
+
+const generateBtn =
+    document.getElementById("generateBtn");
+
+const builderPage =
+    document.getElementById("builderPage");
+
+const resultPage =
+    document.getElementById("resultPage");
+
+const customIntentBox =
+    document.getElementById("customIntentBox");
+
+const customIntent =
+    document.getElementById("customIntent");
+
+const savedIndicator =
+    document.getElementById("savedIndicator");
+
+
+/* =========================================================
+   INTENT CONFIG
+========================================================= */
+
+const intentConfig = {
+
+    birthday:{
+        label:"Birthday Love Experience",
+        emoji:"🎂",
+
+        activeFeatures:[
+            "Birthday Hero",
+            "Birthday Celebration",
+            "Personal Birthday Message",
+            "Memory Timeline",
+            "Photo Gallery",
+            "Reasons I Love You",
+            "Secret Surprise",
+            "Final Birthday Reveal"
+        ],
+
+        disabledFeatures:[
+            "Generic Anniversary Sections",
+            "Distance Map unless locations are provided",
+            "Proposal Flow"
+        ]
+    },
+
+    anniversary:{
+        label:"Anniversary Love Story",
+        emoji:"❤️",
+
+        activeFeatures:[
+            "Anniversary Hero",
+            "Relationship Counter",
+            "Our Beginning",
+            "Relationship Milestones",
+            "Memory Timeline",
+            "Photo Gallery",
+            "Love Letter",
+            "Reasons I Love You",
+            "Anniversary Surprise",
+            "Forever Ending"
+        ],
+
+        disabledFeatures:[
+            "Birthday-specific sections",
+            "Proposal Flow unless requested"
+        ]
+    },
+
+    proposal:{
+        label:"Interactive Proposal Experience",
+        emoji:"💍",
+
+        activeFeatures:[
+            "Cinematic Opening",
+            "Our Story",
+            "Proposal Build-up",
+            "Memory Gallery",
+            "Emotional Love Letter",
+            "Interactive Proposal Question",
+            "Final Reveal"
+        ],
+
+        disabledFeatures:[
+            "Generic Birthday Celebration",
+            "Generic Anniversary Counter"
+        ]
+    },
+
+    confession:{
+        label:"Love Confession Experience",
+        emoji:"💌",
+
+        activeFeatures:[
+            "Emotional Opening",
+            "First Impression Story",
+            "Confession Journey",
+            "Reasons I Love You",
+            "Love Letter",
+            "Interactive Confession Reveal",
+            "Final Emotional Message"
+        ],
+
+        disabledFeatures:[
+            "Generic Birthday sections",
+            "Anniversary-specific milestones"
+        ]
+    },
+
+    longdistance:{
+        label:"Long Distance Love Experience",
+        emoji:"✈️",
+
+        activeFeatures:[
+            "Long Distance Hero",
+            "Location Connection",
+            "Distance-inspired Visual",
+            "Relationship Counter",
+            "Missing You Section",
+            "Memory Timeline",
+            "Next Meeting Countdown",
+            "Love Letter",
+            "Secret Surprise",
+            "Final Reunion Message"
+        ],
+
+        disabledFeatures:[
+            "Distance section if locations are absent",
+            "Meeting countdown if date is absent"
+        ]
+    },
+
+    gift:{
+        label:"Romantic Digital Gift",
+        emoji:"🎁",
+
+        activeFeatures:[
+            "Gift-style Opening",
+            "Personal Story",
+            "Memory Gallery",
+            "Love Letter",
+            "Reasons I Love You",
+            "Secret Surprise",
+            "Final Gift Reveal"
+        ],
+
+        disabledFeatures:[
+            "Unrelated occasion sections"
+        ]
+    },
+
+    justbecause:{
+        label:"Just Because I Love You",
+        emoji:"🥹",
+
+        activeFeatures:[
+            "Emotional Opening",
+            "Appreciation Story",
+            "Reasons I Love You",
+            "Memory Gallery",
+            "Love Letter",
+            "Secret Surprise",
+            "Emotional Ending"
+        ],
+
+        disabledFeatures:[
+            "Birthday sections",
+            "Anniversary-specific sections",
+            "Proposal flow"
+        ]
+    },
+
+    custom:{
+        label:"Custom Romantic Experience",
+        emoji:"✨",
+
+        activeFeatures:[
+            "Custom experience architecture",
+            "Personalized Story",
+            "Dynamic Sections",
+            "Interactive Reveal",
+            "Custom Final Experience"
+        ],
+
+        disabledFeatures:[
+            "Any feature not supported by the user's concept"
+        ]
+    }
+
+};
+
+
+/* =========================================================
+   INTENT SELECTION
+========================================================= */
+
+document.querySelectorAll(".intent-card").forEach(card => {
+
+    card.addEventListener("click", () => {
+
+        document
+            .querySelectorAll(".intent-card")
+            .forEach(item =>
+                item.classList.remove("selected")
+            );
+
+        card.classList.add("selected");
+
+        selectedIntent =
+            card.dataset.intent;
+
+        if(selectedIntent === "custom"){
+
+            customIntentBox.classList.remove("hidden");
+
+        }else{
+
+            customIntentBox.classList.add("hidden");
+
+        }
+
+        updateOccasionUI();
+
+        saveState();
+
+    });
+
+});
+
+
+/* =========================================================
+   OCCASION DYNAMIC UI
+========================================================= */
+
+function updateOccasionUI(){
+
+    document
+        .querySelectorAll(".occasion-fields")
+        .forEach(section =>
+            section.classList.add("hidden")
+        );
+
+    if(!selectedIntent) return;
+
+    const target =
+        document.getElementById(
+            selectedIntent + "Fields"
+        );
+
+    if(target){
+        target.classList.remove("hidden");
+    }
+
+    const titles = {
+
+        birthday:[
+            "Birthday Love Story එක build කරමු 🎂",
+            "Birthday person ගැන AI එකට enough details දෙමු."
+        ],
+
+        anniversary:[
+            "ඔයාලගේ Anniversary එක build කරමු ❤️",
+            "Relationship journey එක website එකේ heart එක කරමු."
+        ],
+
+        proposal:[
+            "Proposal experience එක build කරමු 💍",
+            "Website එක proposal moment එකකට gradually lead කරන්න."
+        ],
+
+        confession:[
+            "හිතේ තියෙන ආදරේ කියමු 💌",
+            "Confession එක emotional journey එකක් කරන්න."
+        ],
+
+        longdistance:[
+            "Distance එකටත් ආදරේ පරදවන්න බැහැ ✈️",
+            "Distance, missing, reunion සහ countdown details එකතු කරමු."
+        ],
+
+        gift:[
+            "Special digital gift එක build කරමු 🎁",
+            "Reason + memories + surprise එක focus කරමු."
+        ],
+
+        justbecause:[
+            "Reason එකක් නැතුව ආදරේ කියමු 🥹",
+            "Appreciation සහ emotion focus කරමු."
+        ],
+
+        custom:[
+            "ඔයාගේ unique experience එක build කරමු ✨",
+            "AI එකට ඔයාගේ concept එක අනුව architecture එකක් හදන්න දෙමු."
+        ]
+
+    };
+
+    if(titles[selectedIntent]){
+
+        document.getElementById("occasionTitle").textContent =
+            titles[selectedIntent][0];
+
+        document.getElementById("occasionDescription").textContent =
+            titles[selectedIntent][1];
+
+    }
+
+}
+
+
+/* =========================================================
+   OPTION CARD UI
+========================================================= */
+
+document
+    .querySelectorAll(".option-card")
+    .forEach(card => {
+
+        const input =
+            card.querySelector("input");
+
+        if(!input) return;
+
+        card.addEventListener("click", () => {
+
+            setTimeout(() => {
+
+                if(input.checked){
+                    card.classList.add("selected");
+                }else{
+                    card.classList.remove("selected");
+                }
+
+            },0);
+
+        });
+
+    });
+
+
+/* =========================================================
+   MEMORY SYSTEM
+========================================================= */
+
+function createMemory(){
+
+    const id =
+        Date.now() +
+        Math.random()
+        .toString(36)
+        .slice(2);
+
+    const memory = {
+        id,
+        title:"",
+        date:"",
+        place:"",
+        story:"",
+        feeling:"",
+        photo:"",
+        caption:""
+    };
+
+    memories.push(memory);
+
+    renderMemories();
+
+    saveState();
+}
+
+
+function renderMemories(){
+
+    const container =
+        document.getElementById(
+            "memoriesContainer"
+        );
+
+    container.innerHTML = "";
+
+    memories.forEach((memory,index) => {
+
+        const div =
+            document.createElement("div");
+
+        div.className = "memory";
+
+        div.dataset.id =
+            memory.id;
+
+        div.innerHTML = `
+
+            <div class="memory-header">
+
+                <div class="memory-label">
+                    📸 Memory ${index + 1}
+                </div>
+
+                <button
+                    type="button"
+                    class="remove-memory"
+                    data-remove="${memory.id}">
+                    ඉවත් කරන්න
+                </button>
+
+            </div>
+
+
+            <div class="two">
+
+                <div class="field">
+
+                    <label>
+                        Memory Title
+                    </label>
+
+                    <input
+                        type="text"
+                        data-field="title"
+                        placeholder="අපේ පළවෙනි Date එක"
+                        value="${escapeAttr(memory.title)}"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Date
+                    </label>
+
+                    <input
+                        type="date"
+                        data-field="date"
+                        value="${escapeAttr(memory.date)}"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Place
+                    <span class="optional">Optional</span>
+                </label>
+
+                <input
+                    type="text"
+                    data-field="place"
+                    placeholder="Galle Face / Kandy / Home..."
+                    value="${escapeAttr(memory.place)}"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Memory Story
+                </label>
+
+                <textarea
+                    data-field="story"
+                    placeholder="එදා මොකද වුණේ..."
+                >${escapeHTML(memory.story)}</textarea>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    ඒ වෙලාවේ දැනුණු Feeling
+                    <span class="optional">Optional</span>
+                </label>
+
+                <input
+                    type="text"
+                    data-field="feeling"
+                    placeholder="So happy / nervous / emotional..."
+                    value="${escapeAttr(memory.feeling)}"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Photo URL
+                    <span class="optional">Optional</span>
+                </label>
+
+                <input
+                    type="url"
+                    data-field="photo"
+                    placeholder="https://..."
+                    value="${escapeAttr(memory.photo)}"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Photo Caption
+                    <span class="optional">Optional</span>
+                </label>
+
+                <input
+                    type="text"
+                    data-field="caption"
+                    placeholder="මේ photo එකේ අපි දෙන්නා..."
+                    value="${escapeAttr(memory.caption)}"
+                >
+
+            </div>
+
+        `;
+
+        container.appendChild(div);
+
+    });
+
+    container
+        .querySelectorAll(".memory")
+        .forEach(block => {
+
+            block
+                .querySelectorAll("[data-field]")
+                .forEach(input => {
+
+                    input.addEventListener(
+                        "input",
+                        () => {
+
+                            const memory =
+                                memories.find(
+                                    item =>
+                                        item.id ===
+                                        block.dataset.id
+                                );
+
+                            if(memory){
+
+                                memory[
+                                    input.dataset.field
+                                ] =
+                                    input.value;
+
+                                saveState();
+
+                            }
+
+                        }
+                    );
+
+                });
+
+
+            block
+                .querySelector("[data-remove]")
+                .addEventListener("click", () => {
+
+                    memories =
+                        memories.filter(
+                            item =>
+                                item.id !==
+                                block.dataset.id
+                        );
+
+                    renderMemories();
+
+                    saveState();
+
+                });
+
+        });
+
+}
+
+
+document
+    .getElementById("addMemory")
+    .addEventListener(
+        "click",
+        createMemory
+    );
+
+
+/* Default memory */
+createMemory();
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function escapeHTML(value){
+
+    return String(value || "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+
+function escapeAttr(value){
+
+    return escapeHTML(value);
+
+}
+
+
+function getValue(name){
+
+    const el =
+        form.elements[name];
+
+    return el
+        ? String(el.value || "").trim()
+        : "";
+
+}
+
+
+function getCheckedValues(name){
+
+    return [
+        ...document.querySelectorAll(
+            `input[name="${name}"]:checked`
+        )
+    ].map(input => input.value);
+
+}
+
+
+function formatDate(value){
+
+    if(!value) return "";
+
+    const date =
+        new Date(value + "T00:00:00");
+
+    if(isNaN(date.getTime()))
+        return value;
+
+    return date.toLocaleDateString(
+        "en-GB",
+        {
+            day:"2-digit",
+            month:"long",
+            year:"numeric"
+        }
+    );
+
+}
+
+
+function clean(value){
+
+    if(value === null ||
+       value === undefined ||
+       String(value).trim() === ""){
+
+        return "Not provided";
+
+    }
+
+    return String(value).trim();
+
+}
+
+
+/* =========================================================
+   FORM DATA
+========================================================= */
+
+function collectData(){
+
+    return {
+
+        intent:selectedIntent,
+
+        customIntent:
+            customIntent.value.trim(),
+
+        yourName:
+            getValue("yourName"),
+
+        partnerName:
+            getValue("partnerName"),
+
+        nickname:
+            getValue("nickname"),
+
+        relationship:
+            getValue("relationship"),
+
+        partnerDescription:
+            getValue("partnerDescription"),
+
+        desiredFeeling:
+            getValue("desiredFeeling"),
+
+
+        birthdayDate:
+            getValue("birthdayDate"),
+
+        birthdayAge:
+            getValue("birthdayAge"),
+
+        birthdayMessage:
+            getValue("birthdayMessage"),
+
+        birthdayFavorites:
+            getValue("birthdayFavorites"),
+
+
+        anniversaryType:
+            getValue("anniversaryType"),
+
+        anniversaryMilestones:
+            getValue("anniversaryMilestones"),
+
+        anniversaryMessage:
+            getValue("anniversaryMessage"),
+
+
+        proposalStory:
+            getValue("proposalStory"),
+
+        proposalLocation:
+            getValue("proposalLocation"),
+
+        proposalDate:
+            getValue("proposalDate"),
+
+        proposalQuestion:
+            getValue("proposalQuestion"),
+
+
+        firstFeeling:
+            getValue("firstFeeling"),
+
+        confessionReason:
+            getValue("confessionReason"),
+
+        confessionMessage:
+            getValue("confessionMessage"),
+
+
+        yourCity:
+            getValue("yourCity"),
+
+        partnerCity:
+            getValue("partnerCity"),
+
+        distanceDuration:
+            getValue("distanceDuration"),
+
+        distanceFeeling:
+            getValue("distanceFeeling"),
+
+        nextMeeting:
+            getValue("nextMeeting"),
+
+
+        giftReason:
+            getValue("giftReason"),
+
+        justBecauseMessage:
+            getValue("justBecauseMessage"),
+
+        customExperience:
+            getValue("customExperience"),
+
+
+        relationshipStart:
+            getValue("relationshipStart"),
+
+        specialDate:
+            getValue("specialDate"),
+
+        favoriteSong:
+            getValue("favoriteSong"),
+
+        mainMemory:
+            getValue("mainMemory"),
+
+
+        howMet:
+            getValue("howMet"),
+
+        firstConversation:
+            getValue("firstConversation"),
+
+        favoriteMemory:
+            getValue("favoriteMemory"),
+
+        whatILove:
+            getValue("whatILove"),
+
+        whatMakesSpecial:
+            getValue("whatMakesSpecial"),
+
+        learnedFromPartner:
+            getValue("learnedFromPartner"),
+
+
+        styles:
+            getCheckedValues("style"),
+
+        colors:
+            getValue("favoriteColor"),
+
+        mood:
+            getValue("mood"),
+
+        typography:
+            getValue("typography"),
+
+
+        features:
+            getCheckedValues("feature"),
+
+        openingInteraction:
+            getValue("openingInteraction"),
+
+
+        loveMessage:
+            getValue("loveMessage"),
+
+        ending:
+            getValue("ending"),
+
+        surprise:
+            getValue("surprise"),
+
+        finalFeeling:
+            getValue("finalFeeling"),
+
+
+        memories:memories.map(
+            (memory,index) => ({
+                number:index + 1,
+                title:memory.title,
+                date:memory.date,
+                place:memory.place,
+                story:memory.story,
+                feeling:memory.feeling,
+                photo:memory.photo,
+                caption:memory.caption
+            })
+        )
+
+    };
+
+}
+
+
+/* =========================================================
+   SMART FEATURE ENGINE
+========================================================= */
+
+function getSmartFeatures(data){
+
+    let active = [];
+
+    let disabled = [];
+
+    const config =
+        intentConfig[data.intent];
+
+    if(config){
+
+        active.push(
+            ...config.activeFeatures
+        );
+
+        disabled.push(
+            ...config.disabledFeatures
+        );
+
+    }
+
+
+    /*
+       User-selected features
+    */
+
+    active.push(
+        ...data.features
+    );
+
+
+    /*
+       Automatic conditional features
+    */
+
+    if(data.relationshipStart){
+
+        active.push(
+            "Live Relationship Duration Counter"
+        );
+
+    }else{
+
+        disabled.push(
+            "Relationship Counter because no start date was provided"
+        );
+
+    }
+
+
+    if(data.nextMeeting){
+
+        active.push(
+            "Live Next Meeting Countdown"
+        );
+
+    }else{
+
+        disabled.push(
+            "Meeting Countdown because no next meeting date was provided"
+        );
+
+    }
+
+
+    if(data.yourCity && data.partnerCity){
+
+        active.push(
+            "Distance / Location Connection Section"
+        );
+
+    }else{
+
+        disabled.push(
+            "Location Distance Section because both locations were not provided"
+        );
+
+    }
+
+
+    if(data.favoriteSong){
+
+        active.push(
+            "Favorite Song Experience"
+        );
+
+    }else{
+
+        disabled.push(
+            "Music section because no song was provided"
+        );
+
+    }
+
+
+    if(data.memories.length){
+
+        active.push(
+            "Personal Memory Timeline"
+        );
+
+    }else{
+
+        disabled.push(
+            "Memory Timeline because no memories were provided"
+        );
+
+    }
+
+
+    if(
+        data.memories.some(
+            memory =>
+                memory.photo
+        )
+    ){
+
+        active.push(
+            "Personal Photo Gallery"
+        );
+
+    }else{
+
+        disabled.push(
+            "Photo Gallery using real user photos because no photo URLs were provided"
+        );
+
+    }
+
+
+    if(data.surprise){
+
+        active.push(
+            "Secret Surprise Reveal"
+        );
+
+    }else{
+
+        disabled.push(
+            "Secret Surprise because no surprise content was provided"
+        );
+
+    }
+
+
+    return {
+
+        active:[
+            ...new Set(active)
+        ],
+
+        disabled:[
+            ...new Set(disabled)
+        ]
+
+    };
+
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+function updateSummary(){
+
+    const data =
+        collectData();
+
+    const grid =
+        document.getElementById(
+            "summaryGrid"
+        );
+
+    const config =
+        intentConfig[data.intent];
+
+    const summary = [
+
+        [
+            "Experience",
+            config
+                ? `${config.emoji} ${config.label}`
+                : "Not selected"
+        ],
+
+        [
+            "Couple",
+            `${clean(data.yourName)} ❤️ ${clean(data.partnerName)}`
+        ],
+
+        [
+            "Mood",
+            clean(data.mood)
+        ],
+
+        [
+            "Visual Style",
+            data.styles.length
+                ? data.styles.join(", ")
+                : "AI Recommended"
+        ],
+
+        [
+            "Memories",
+            `${data.memories.length} added`
+        ],
+
+        [
+            "Features",
+            `${data.features.length} selected`
+        ]
+
+    ];
+
+    grid.innerHTML =
+        summary
+            .map(item => `
+
+                <div class="summary-item">
+
+                    <span>
+                        ${escapeHTML(item[0])}
+                    </span>
+
+                    <strong>
+                        ${escapeHTML(item[1])}
+                    </strong>
+
+                </div>
+
+            `)
+            .join("");
+
+}
+
+
+/* =========================================================
+   VALIDATION
+========================================================= */
+
+function validateCurrentStep(){
+
+    /*
+       Step 1
+    */
+
+    if(currentStep === 1){
+
+        if(!selectedIntent){
+
+            alert(
+                "❤️ මුලින්ම ඔයා හදන්න යන experience එක තෝරන්න."
+            );
+
+            return false;
+
+        }
+
+        if(
+            selectedIntent === "custom" &&
+            !customIntent.value.trim()
+        ){
+
+            alert(
+                "✨ ඔයාගේ custom idea එක පොඩ්ඩක් කියන්න."
+            );
+
+            customIntent.focus();
+
+            return false;
+
+        }
+
+    }
+
+
+    /*
+       Step 2
+    */
+
+    if(currentStep === 2){
+
+        const yourName =
+            getValue("yourName");
+
+        const partnerName =
+            getValue("partnerName");
+
+        if(!yourName || !partnerName){
+
+            alert(
+                "💕 ඔයාගේ නම සහ එයාගේ නම දෙන්න."
+            );
+
+            return false;
+
+        }
+
+    }
+
+
+    return true;
+
+}
+
+
+/* =========================================================
+   STEP UI
+========================================================= */
+
+function updateStep(){
+
+    steps.forEach(step =>
+        step.classList.remove("active")
+    );
+
+    const current =
+        document.querySelector(
+            `.step[data-step="${currentStep}"]`
+        );
+
+    if(current){
+        current.classList.add("active");
+    }
+
+
+    const percent =
+        (currentStep / TOTAL_STEPS) * 100;
+
+    progressFill.style.width =
+        percent + "%";
+
+    stepText.textContent =
+        `පියවර ${currentStep} / ${TOTAL_STEPS}`;
+
+    stepPercent.textContent =
+        Math.round(percent) + "%";
+
+
+    backBtn.style.display =
+        currentStep === 1
+            ? "none"
+            : "block";
+
+
+    if(currentStep === TOTAL_STEPS){
+
+        nextBtn.classList.add("hidden");
+
+        generateBtn.classList.remove("hidden");
+
+        updateSummary();
+
+    }else{
+
+        nextBtn.classList.remove("hidden");
+
+        generateBtn.classList.add("hidden");
+
+    }
+
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+
+}
+
+
+/* =========================================================
+   NEXT
+========================================================= */
+
+nextBtn.addEventListener("click", () => {
+
+    if(!validateCurrentStep())
+        return;
+
+    if(currentStep < TOTAL_STEPS){
+
+        currentStep++;
+
+        updateStep();
+
+        saveState();
+
+    }
+
+});
+
+
+/* =========================================================
+   BACK
+========================================================= */
+
+backBtn.addEventListener("click", () => {
+
+    if(currentStep > 1){
+
+        currentStep--;
+
+        updateStep();
+
+    }
+
+});
+
+
+/* =========================================================
+   MASTER PROMPT ENGINE
+========================================================= */
+
+function generateMasterPrompt(data){
+
+    const config =
+        intentConfig[data.intent] ||
+        intentConfig.custom;
+
+    const smart =
+        getSmartFeatures(data);
+
+
+    let memoryText =
+        data.memories.length
+        ? data.memories.map(memory => `
+
+MEMORY ${memory.number}
+
+Title:
+${clean(memory.title)}
+
+Date:
+${formatDate(memory.date) || "Not provided"}
+
+Place:
+${clean(memory.place)}
+
+Story:
+${clean(memory.story)}
+
+Feeling:
+${clean(memory.feeling)}
+
+Photo URL:
+${clean(memory.photo)}
+
+Caption:
+${clean(memory.caption)}
+
+`).join("\n")
+        : "No specific memories were provided.";
+
+
+    const selectedStyles =
+        data.styles.length
+            ? data.styles.join(" + ")
+            : "AI should choose a suitable premium romantic visual direction";
+
+
+    const selectedFeatures =
+        data.features.length
+            ? data.features.join(", ")
+            : "AI should intelligently select appropriate interactions";
+
+
+    const locationSection =
+        data.yourCity ||
+        data.partnerCity
+        ? `
+
+My Location:
+${clean(data.yourCity)}
+
+Partner Location:
+${clean(data.partnerCity)}
+
+Distance Duration:
+${clean(data.distanceDuration)}
+
+Distance Feeling:
+${clean(data.distanceFeeling)}
+
+Next Meeting:
+${formatDate(data.nextMeeting) || "Not provided"}
+`
+        : "No location information was provided.";
+
+
+    const occasionDetails = `
+
+Birthday Date:
+${formatDate(data.birthdayDate) || "Not provided"}
+
+Birthday Age:
+${clean(data.birthdayAge)}
+
+Birthday Message:
+${clean(data.birthdayMessage)}
+
+Birthday Favorites:
+${clean(data.birthdayFavorites)}
+
+Anniversary Type:
+${clean(data.anniversaryType)}
+
+Anniversary Milestones:
+${clean(data.anniversaryMilestones)}
+
+Anniversary Message:
+${clean(data.anniversaryMessage)}
+
+Proposal Story:
+${clean(data.proposalStory)}
+
+Proposal Location:
+${clean(data.proposalLocation)}
+
+Proposal Date:
+${formatDate(data.proposalDate) || "Not provided"}
+
+Proposal Question:
+${clean(data.proposalQuestion)}
+
+First Feeling:
+${clean(data.firstFeeling)}
+
+Confession Reason:
+${clean(data.confessionReason)}
+
+Confession Message:
+${clean(data.confessionMessage)}
+
+Gift Reason:
+${clean(data.giftReason)}
+
+Just Because Message:
+${clean(data.justBecauseMessage)}
+
+Custom Experience:
+${clean(data.customExperience)}
+`;
+
+
+    const prompt = `
+
+================================================================
+❤️ LOVE STORY AI — PERSONALIZED MASTER WEBSITE BUILD PROMPT
+================================================================
+
+PROJECT TYPE:
+${config.emoji} ${config.label}
+
+CREATIVE DIRECTIVE:
+You are an expert senior frontend engineer, romantic UX/UI
+designer, creative director, interaction designer and emotional
+storytelling specialist.
+
+Your task is to build a COMPLETE, production-quality,
+highly-personalized romantic website based specifically on the
+user information below.
+
+This is NOT a generic romantic template.
+
+This website should feel as if an actual human personally
+designed an entire digital world specifically for this couple.
+
+The final result should create the emotional feeling:
+
+"Someone created this entire little universe just for me."
+
+================================================================
+🧠 CORE PERSONALIZATION RULES
+================================================================
+
+1. Treat the provided personal information as the source of truth.
+
+2. Never invent major personal facts.
+
+3. Never fabricate memories, dates, locations, names or photos.
+
+4. If information is missing, intelligently omit the related
+   section instead of displaying awkward placeholders.
+
+5. Do not expose the fact that an AI generated the content.
+
+6. Do not simply display form answers as boring paragraphs.
+
+7. Transform the information into natural, beautiful,
+   emotionally-written website content.
+
+8. Preserve the user's intended meaning.
+
+9. Keep personal content authentic rather than overly generic.
+
+10. Every major visual/content decision should support the selected
+    occasion and emotional purpose.
+
+================================================================
+🎯 EXPERIENCE INTENT
+================================================================
+
+Experience:
+${config.emoji} ${config.label}
+
+Custom User Intent:
+${clean(data.customIntent)}
+
+Primary Emotional Goal:
+${clean(data.desiredFeeling)}
+
+Desired Final Feeling:
+${clean(data.finalFeeling)}
+
+================================================================
+💖 COUPLE INFORMATION
+================================================================
+
+My Name:
+${clean(data.yourName)}
+
+Partner Name:
+${clean(data.partnerName)}
+
+Nickname:
+${clean(data.nickname)}
+
+Relationship:
+${clean(data.relationship)}
+
+Partner Description:
+${clean(data.partnerDescription)}
+
+================================================================
+🎂❤️💍 OCCASION-SPECIFIC INFORMATION
+================================================================
+${occasionDetails}
+
+================================================================
+💕 OUR REAL LOVE STORY
+================================================================
+
+How We Met:
+${clean(data.howMet)}
+
+First Conversation:
+${clean(data.firstConversation)}
+
+Favorite Memory:
+${clean(data.favoriteMemory)}
+
+What I Love About My Partner:
+${clean(data.whatILove)}
+
+What Makes My Partner Special:
+${clean(data.whatMakesSpecial)}
+
+What I Learned From My Partner:
+${clean(data.learnedFromPartner)}
+
+Main Relationship Memory:
+${clean(data.mainMemory)}
+
+================================================================
+📅 IMPORTANT DATES
+================================================================
+
+Relationship Start:
+${formatDate(data.relationshipStart) || "Not provided"}
+
+Special Date:
+${formatDate(data.specialDate) || "Not provided"}
+
+Next Meeting:
+${formatDate(data.nextMeeting) || "Not provided"}
+
+================================================================
+🌍 LOCATION / DISTANCE
+================================================================
+${locationSection}
+
+================================================================
+📸 PERSONAL MEMORIES
+================================================================
+
+${memoryText}
+
+IMPORTANT PHOTO RULE:
+Only use actual photo URLs provided by the user.
+Never invent fake image URLs.
+If no image URL is provided, use an elegant visual placeholder
+or CSS-generated memory treatment rather than a fake external image.
+
+================================================================
+🎵 MUSIC
+================================================================
+
+Favorite Song:
+${clean(data.favoriteSong)}
+
+If a song URL is supplied, use it appropriately.
+
+Do NOT autoplay audio without user interaction.
+
+If no song is supplied, do not force a music player.
+
+================================================================
+🎨 VISUAL DIRECTION
+================================================================
+
+Primary Visual Style:
+${selectedStyles}
+
+Mood:
+${clean(data.mood)}
+
+Preferred Colors:
+${clean(data.colors)}
+
+Typography:
+${clean(data.typography)}
+
+The visual design should feel:
+
+- Premium
+- Romantic
+- Emotional
+- Modern
+- Cinematic where appropriate
+- Highly polished
+- Mobile-first
+- Immersive
+- Elegant
+- Personal
+- Responsive
+- Smooth
+- Visually memorable
+
+Avoid:
+
+- Generic Bootstrap-looking layouts
+- Plain white forms
+- Cheap gradients
+- Excessive emojis
+- Clutter
+- Amateur UI
+- Random animations
+- Huge empty spaces
+- Unnecessary sections
+- Generic placeholder copy
+
+================================================================
+✨ ACTIVE EXPERIENCE FEATURES
+================================================================
+
+The following features are specifically relevant to this project:
+
+${smart.active.map(
+    feature => `✓ ${feature}`
+).join("\n")}
+
+USER-REQUESTED INTERACTIONS:
+
+${selectedFeatures}
+
+================================================================
+🚫 DISABLED / OMITTED FEATURES
+================================================================
+
+The following should NOT be unnecessarily included:
+
+${smart.disabled.map(
+    feature => `✗ ${feature}`
+).join("\n")}
+
+Do not force disabled features into the website.
+
+================================================================
+🎬 OPENING EXPERIENCE
+================================================================
+
+Preferred opening interaction:
+
+${clean(data.openingInteraction)}
+
+If this information exists, use it as the inspiration for the
+opening experience.
+
+The opening should immediately establish:
+
+- Emotional curiosity
+- Personal connection
+- Visual quality
+- The identity of the couple
+- The purpose of the website
+
+================================================================
+🏗️ RECOMMENDED EXPERIENCE ARCHITECTURE
+================================================================
+
+Build the website as an intentional emotional journey.
+
+Do NOT blindly use every section below.
+
+Select and adapt sections based on the actual project.
+
+---------------------------------------------------------------
+1. CINEMATIC / EMOTIONAL OPENING
+---------------------------------------------------------------
+
+Create a strong first-screen experience.
+
+Possible content:
+
+${clean(data.yourName)} ❤️ ${clean(data.partnerName)}
+
+Use a personalized subtitle derived from the actual story.
+
+Include a clear interaction such as:
+
+"Enter our story"
+"Open your surprise"
+"Click when you're ready"
+or another contextually appropriate CTA.
+
+---------------------------------------------------------------
+2. HERO STORY
+---------------------------------------------------------------
+
+Create a personalized hero experience that establishes why this
+website exists.
+
+Never use generic copy when personal information is available.
+
+---------------------------------------------------------------
+3. RELATIONSHIP COUNTER
+---------------------------------------------------------------
+
+If a relationship start date exists, create a LIVE counter showing:
+
+Days
+Hours
+Minutes
+Seconds
+
+Calculate this dynamically with JavaScript.
+
+Do not hardcode the numbers.
+
+---------------------------------------------------------------
+4. OCCASION EXPERIENCE
+---------------------------------------------------------------
+
+Prioritize the selected occasion.
+
+For BIRTHDAY:
+Create a meaningful birthday celebration rather than generic
+birthday decorations.
+
+For ANNIVERSARY:
+Focus on the relationship journey, milestones and shared history.
+
+For PROPOSAL:
+Build emotional anticipation and lead naturally toward the
+proposal question.
+
+For CONFESSION:
+Build a gradual emotional confession journey.
+
+For LONG DISTANCE:
+Focus on distance, missing, connection and reunion.
+
+For GIFT:
+Make the website feel like opening a digital gift.
+
+For JUST BECAUSE:
+Focus on appreciation, love and emotional intimacy.
+
+For CUSTOM:
+Follow the user's custom concept as the primary architecture.
+
+---------------------------------------------------------------
+5. OUR STORY
+---------------------------------------------------------------
+
+Transform:
+
+- How we met
+- First conversation
+- Favorite memory
+- What I love
+- What makes them special
+- What I learned
+
+into elegant storytelling.
+
+Do not display them as form labels.
+
+---------------------------------------------------------------
+6. MEMORY TIMELINE
+---------------------------------------------------------------
+
+If memories exist, create a beautiful timeline.
+
+Each memory can include:
+
+- Date
+- Title
+- Place
+- Story
+- Feeling
+- Photo
+- Caption
+
+Use visual hierarchy and elegant transitions.
+
+---------------------------------------------------------------
+7. PHOTO EXPERIENCE
+---------------------------------------------------------------
+
+If real photo URLs are supplied, create a responsive gallery.
+
+Use:
+
+- Lightbox
+- Soft hover effects
+- Mobile-friendly layout
+- Captions when supplied
+- Elegant transitions
+
+Never invent photos.
+
+---------------------------------------------------------------
+8. LOVE LETTER
+---------------------------------------------------------------
+
+Create an emotional love-letter section.
+
+The writing should feel intimate and personal.
+
+Use:
+
+${clean(data.loveMessage)}
+
+Do not rewrite the meaning into generic AI romance.
+
+---------------------------------------------------------------
+9. LONG DISTANCE EXPERIENCE
+---------------------------------------------------------------
+
+Only include if relevant.
+
+Potentially show:
+
+${clean(data.yourCity)} ❤️ ${clean(data.partnerCity)}
+
+If both locations exist, create a beautiful distance-inspired
+visual treatment.
+
+Do not claim an exact geographical distance unless it can be
+reliably calculated.
+
+---------------------------------------------------------------
+10. NEXT MEETING COUNTDOWN
+---------------------------------------------------------------
+
+If a next meeting date exists:
+
+${formatDate(data.nextMeeting) || "No date provided"}
+
+Create a live countdown.
+
+When countdown reaches zero, gracefully change the message to a
+celebratory reunion state.
+
+---------------------------------------------------------------
+11. REASONS I LOVE YOU
+---------------------------------------------------------------
+
+Use the user's actual answers to create an elegant list/card
+experience.
+
+Do not invent reasons.
+
+---------------------------------------------------------------
+12. FAVORITE SONG
+---------------------------------------------------------------
+
+If provided:
+
+${clean(data.favoriteSong)}
+
+Create a user-controlled music experience.
+
+Never autoplay.
+
+---------------------------------------------------------------
+13. SECRET SURPRISE
+---------------------------------------------------------------
+
+If supplied:
+
+${clean(data.surprise)}
+
+Create a hidden reveal interaction.
+
+Possible interaction:
+
+"Click when you miss me ❤️"
+
+The reveal should feel rewarding and emotional.
+
+---------------------------------------------------------------
+14. FINAL EXPERIENCE
+---------------------------------------------------------------
+
+End with the strongest emotional moment.
+
+Use:
+
+Final Message:
+${clean(data.loveMessage)}
+
+Ending:
+${clean(data.ending)}
+
+Final Feeling:
+${clean(data.finalFeeling)}
+
+The ending should feel intentional, memorable and emotionally
+complete.
+
+================================================================
+🎞️ ANIMATION DIRECTION
+================================================================
+
+Use animations to support emotion, not distract from content.
+
+Possible effects:
+
+- Floating particles
+- Soft glowing hearts
+- Gradient movement
+- Scroll reveals
+- Cinematic fade-ins
+- Text reveal
+- Gentle image zoom
+- Timeline progression
+- Elegant hover interactions
+- Soft blur transitions
+- Final reveal animation
+
+Animations must be:
+
+- Smooth
+- Lightweight
+- Responsive
+- Mobile-friendly
+
+Respect prefers-reduced-motion when possible.
+
+================================================================
+📱 RESPONSIVE REQUIREMENTS
+================================================================
+
+The website MUST be fully responsive.
+
+Optimize specifically for:
+
+- Mobile phones
+- Tablets
+- Desktop
+- Large screens
+
+Mobile must NOT look like a squeezed desktop version.
+
+Use:
+
+- Touch-friendly controls
+- Responsive typography
+- Comfortable spacing
+- Proper image sizing
+- No horizontal scrolling
+
+================================================================
+💻 TECHNICAL REQUIREMENTS
+================================================================
+
+Preferred implementation:
+
+HTML5
+CSS3
+Vanilla JavaScript
+
+Prefer a single self-contained HTML file when practical.
+
+Include:
+
+- Embedded CSS
+- Embedded JavaScript
+- Semantic HTML
+- Clean component-like structure
+- CSS variables
+- Responsive media queries
+- Accessible interactions
+
+Avoid unnecessary dependencies.
+
+If external libraries are genuinely useful, keep them minimal.
+
+Every button must actually work.
+
+Every interactive feature must actually work.
+
+Countdowns must be live.
+
+Counters must be live.
+
+Secret reveals must work.
+
+Navigation must work.
+
+Gallery interactions must work if implemented.
+
+================================================================
+♿ ACCESSIBILITY
+================================================================
+
+Maintain readable contrast.
+
+Use keyboard-friendly interactive controls.
+
+Provide meaningful button labels.
+
+Do not communicate essential information through color alone.
+
+Support reduced motion where practical.
+
+================================================================
+🛡️ CONTENT SAFETY / DATA INTEGRITY
+================================================================
+
+Never fabricate:
+
+- Personal facts
+- Memories
+- Dates
+- Photos
+- Locations
+- Relationships
+- Quotes
+
+Never expose private implementation details.
+
+Never create fake photo URLs.
+
+Never pretend missing information exists.
+
+If something is missing, design around the missing information.
+
+================================================================
+🎨 FINAL QUALITY STANDARD
+================================================================
+
+The finished website should NOT feel like:
+
+"an HTML template generated by AI."
+
+It should feel like:
+
+"a premium interactive romantic microsite created by a professional
+creative studio specifically for this couple."
+
+Pay special attention to:
+
+- Visual hierarchy
+- Typography
+- Spacing
+- Emotional pacing
+- Micro-interactions
+- Responsive behavior
+- Storytelling
+- Personalization
+- Transitions
+- Final reveal
+
+Avoid overloading the website with every possible feature.
+
+Choose the features that make sense for this specific couple.
+
+================================================================
+❤️ FINAL CREATIVE INSTRUCTION
+================================================================
+
+Build the complete website now.
+
+Do not give me an explanation instead of the website.
+
+Do not give me pseudocode.
+
+Do not leave unfinished sections.
+
+Do not use generic placeholder content when personal information
+exists.
+
+Make the final website emotionally powerful, technically complete,
+beautiful, responsive and genuinely personal.
+
+The experience should make the partner feel:
+
+"මේ website එක හදලා තියෙන්නේ මම වෙනුවෙන්මයි."
+
+================================================================
+END OF MASTER BUILD PROMPT
+================================================================
+
+`;
+
+
+    return prompt.trim();
+
+}
+
+
+/* =========================================================
+   GENERATE
+========================================================= */
+
+generateBtn.addEventListener("click", () => {
+
+    if(!validateCurrentStep())
+        return;
+
+    const data =
+        collectData();
+
+    const prompt =
+        generateMasterPrompt(data);
+
+    document
+        .getElementById("generatedPrompt")
+        .value = prompt;
+
+    document
+        .getElementById("promptSize")
+        .textContent =
+            prompt.length.toLocaleString() +
+            " characters";
+
+    builderPage.style.display =
+        "none";
+
+    resultPage.style.display =
+        "block";
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+
+});
+
+
+/* =========================================================
+   COPY
+========================================================= */
+
+document
+    .getElementById("copyBtn")
+    .addEventListener(
+        "click",
+        async () => {
+
+            const textarea =
+                document.getElementById(
+                    "generatedPrompt"
+                );
+
+            const text =
+                textarea.value;
+
+            try{
+
+                await navigator
+                    .clipboard
+                    .writeText(text);
+
+            }catch(error){
+
+                textarea.removeAttribute("readonly");
+
+                textarea.select();
+
+                document.execCommand("copy");
+
+                textarea.setAttribute(
+                    "readonly",
+                    true
+                );
+
+            }
+
+            const success =
+                document.getElementById(
+                    "copySuccess"
+                );
+
+            const button =
+                document.getElementById(
+                    "copyBtn"
+                );
+
+            success.style.display =
+                "block";
+
+            button.textContent =
+                "✓ Copied!";
+
+            setTimeout(() => {
+
+                success.style.display =
+                    "none";
+
+                button.textContent =
+                    "📋 Copy Master Prompt";
+
+            },2500);
+
+        }
+    );
+
+
+/* =========================================================
+   EDIT
+========================================================= */
+
+document
+    .getElementById("editBtn")
+    .addEventListener(
+        "click",
+        () => {
+
+            resultPage.style.display =
+                "none";
+
+            builderPage.style.display =
+                "block";
+
+            currentStep =
+                TOTAL_STEPS;
+
+            updateStep();
+
+        }
+    );
+
+
+/* =========================================================
+   NEW
+========================================================= */
+
+document
+    .getElementById("newBtn")
+    .addEventListener(
+        "click",
+        () => {
+
+            if(
+                !confirm(
+                    "අලුත් Love Story එකක් පටන් ගන්නද? දැනට තියෙන details clear වෙනවා."
+                )
+            ){
+
+                return;
+
+            }
+
+            localStorage.removeItem(
+                "loveStoryAI_v2"
+            );
+
+            location.reload();
+
+        }
+    );
+
+
+/* =========================================================
+   AUTO SAVE
+========================================================= */
+
+function saveState(){
+
+    try{
+
+        const state = {
+
+            currentStep,
+
+            selectedIntent,
+
+            customIntent:
+                customIntent.value,
+
+            memories,
+
+            fields:{}
+
+        };
+
+
+        [
+            ...form.elements
+        ].forEach(element => {
+
+            if(!element.name)
+                return;
+
+            if(
+                element.type === "checkbox" ||
+                element.type === "radio"
+            ){
+
+                return;
+
+            }
+
+            state.fields[element.name] =
+                element.value;
+
+        });
+
+
+        state.styles =
+            getCheckedValues("style");
+
+        state.features =
+            getCheckedValues("feature");
+
+
+        localStorage.setItem(
+            "loveStoryAI_v2",
+            JSON.stringify(state)
+        );
+
+
+        savedIndicator.textContent =
+            "✓ Saved locally";
+
+        setTimeout(() => {
+
+            savedIndicator.textContent =
+                "● Auto-save";
+
+        },1000);
+
+    }catch(error){
+
+        console.warn(
+            "Local save unavailable."
+        );
+
+    }
+
+}
+
+
+form.addEventListener(
+    "input",
+    saveState
+);
+
+
+form.addEventListener(
+    "change",
+    saveState
+);
+
+
+/* =========================================================
+   RESTORE
+========================================================= */
+
+function restoreState(){
+
+    try{
+
+        const raw =
+            localStorage.getItem(
+                "loveStoryAI_v2"
+            );
+
+        if(!raw)
+            return;
+
+        const state =
+            JSON.parse(raw);
+
+
+        selectedIntent =
+            state.selectedIntent || "";
+
+
+        if(selectedIntent){
+
+            document
+                .querySelectorAll(".intent-card")
+                .forEach(card => {
+
+                    if(
+                        card.dataset.intent ===
+                        selectedIntent
+                    ){
+
+                        card.classList.add(
+                            "selected"
+                        );
+
+                    }
+
+                });
+
+        }
+
+
+        customIntent.value =
+            state.customIntent || "";
+
+
+        if(selectedIntent === "custom"){
+
+            customIntentBox.classList.remove(
+                "hidden"
+            );
+
+        }
+
+
+        if(state.fields){
+
+            Object.entries(
+                state.fields
+            ).forEach(([name,value]) => {
+
+                const element =
+                    form.elements[name];
+
+                if(element &&
+                   element.type !== "checkbox" &&
+                   element.type !== "radio"){
+
+                    element.value =
+                        value || "";
+
+                }
+
+            });
+
+        }
+
+
+        if(
+            Array.isArray(state.memories) &&
+            state.memories.length
+        ){
+
+            memories =
+                state.memories;
+
+            renderMemories();
+
+        }
+
+
+        if(
+            Array.isArray(state.styles)
+        ){
+
+            document
+                .querySelectorAll(
+                    'input[name="style"]'
+                )
+                .forEach(input => {
+
+                    input.checked =
+                        state.styles
+                            .includes(
+                                input.value
+                            );
+
+                    if(input.checked){
+
+                        input
+                            .closest(
+                                ".option-card"
+                            )
+                            ?.classList
+                            .add("selected");
+
+                    }
+
+                });
+
+        }
+
+
+        if(
+            Array.isArray(state.features)
+        ){
+
+            document
+                .querySelectorAll(
+                    'input[name="feature"]'
+                )
+                .forEach(input => {
+
+                    input.checked =
+                        state.features
+                            .includes(
+                                input.value
+                            );
+
+                    if(input.checked){
+
+                        input
+                            .closest(
+                                ".option-card"
+                            )
+                            ?.classList
+                            .add("selected");
+
+                    }
+
+                });
+
+        }
+
+
+        updateOccasionUI();
+
+        if(
+            Number.isInteger(
+                state.currentStep
+            )
+        ){
+
+            currentStep =
+                Math.min(
+                    Math.max(
+                        state.currentStep,
+                        1
+                    ),
+                    TOTAL_STEPS
+                );
+
+        }
+
+    }catch(error){
+
+        console.warn(
+            "Restore failed."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+restoreState();
+
+updateStep();
+
+</script>
+
+</body>
+</html>
